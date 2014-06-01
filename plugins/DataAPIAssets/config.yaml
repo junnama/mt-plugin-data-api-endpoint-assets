@@ -1,0 +1,40 @@
+name: DataAPIAssets
+id:   DataAPIAssets
+config_settings:
+    DataAPIAssetsRequiresLogin:
+        default: 1
+        updatable: 1
+applications:
+    data_api:
+        endpoints:
+            - id: list_assets
+              route: /sites/:site_id/assets
+              verb: GET
+              version: 1
+              handler: DataAPIAssets::EndPoint::Asset::list_assets
+              requires_login: 0
+            - id: list_assets_image
+              route: /sites/:site_id/assets/image
+              verb: GET
+              version: 1
+              handler: DataAPIAssets::EndPoint::Asset::list_assets
+              requires_login: 0
+            - id: list_assets_video
+              route: /sites/:site_id/assets/video
+              verb: GET
+              version: 1
+              handler: DataAPIAssets::EndPoint::Asset::list_assets
+              requires_login: 0
+            - id: list_assets_audio
+              route: /sites/:site_id/assets/audio
+              verb: GET
+              version: 1
+              handler: DataAPIAssets::EndPoint::Asset::list_assets
+              requires_login: 0
+        resources:
+            asset:
+                fields:
+                    - name: image_width
+                      from_object: DataAPIAssets::Resource::Asset::image_width
+                    - name: image_height
+                      from_object: DataAPIAssets::Resource::Asset::image_height
