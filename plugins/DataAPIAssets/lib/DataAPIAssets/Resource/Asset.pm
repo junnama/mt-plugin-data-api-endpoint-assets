@@ -21,10 +21,15 @@ sub icon_url {
     my ( $obj, $hash, $field, $stash ) = @_;
     my $class_type = $obj->class;
     require MT::FileMgr;
-    my $fmgr = MT::FileMgr->new('Local');
+    my $fmgr = MT::FileMgr->new( 'Local' );
     my $file_path = $obj->file_path;
-    my $thumb_size = 45;
-    my $img = MT->static_path . 'images/asset/' . $class_type . '-45.png';
+    my $thumb_size = MT->config( 'DataAPIAssetsIconSize' ) || 45;
+    my $icon_size = $thumb_size > 20 ? 45 : 20;
+    my $static_path = MT->static_path;
+    if ( $static_path !~ m!^https{0,1}://! ) {
+        $static_path = MT->instance()->base . $static_path;
+    }
+    my $img = $static_path . 'images/asset/' . $class_type . '-' . $icon_size . '.png';
     if ( $file_path && $fmgr->exists( $file_path ) ) {
         if ( $obj->has_thumbnail && $obj->can_create_thumbnail ) {
             my ( $orig_width, $orig_height )
@@ -54,7 +59,7 @@ sub icon_url {
             return $thumbnail_url if $thumbnail_url;
         }
     } else {
-        $img = MT->static_path . 'images/asset/' . $class_type . '-warning-45.png';
+        $img = $static_path . 'images/asset/' . $class_type . '-warning-' . $icon_size . '.png';
     }
     return $img;
 }

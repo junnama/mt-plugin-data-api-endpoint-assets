@@ -1,8 +1,12 @@
 name: DataAPIAssets
 id:   DataAPIAssets
+version: 0.3
 config_settings:
     DataAPIAssetsRequiresLogin:
         default: 1
+        updatable: 1
+    DataAPIAssetsIconSize:
+        default: 45
         updatable: 1
 applications:
     data_api:
