@@ -46,13 +46,11 @@ sub list_assets {
     }
     $args->{ limit } = $limit;
     $args->{ offset } = $offset;
-    my $iter = MT->model( $class )->load_iter( { blog_id => $blog->id }, $args );
-    my @assets;
-    while ( my $asset = $iter->() ) {
-        push( @assets, $asset );
-    }
+    my $terms = { blog_id => $blog->id };
+    my $count = MT->model( $class )->count( $terms );
+    my @assets = MT->model( $class )->load( $terms, $args );
     return {
-        totalResults => scalar( @assets ),
+        totalResults => $count + 0,
         items => \@assets,
     };
 }
