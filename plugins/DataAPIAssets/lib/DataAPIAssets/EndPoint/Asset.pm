@@ -3,13 +3,27 @@ use strict;
 
 use MT::DataAPI::Endpoint::Common;
 
+sub get_asset {
+    my ( $app, $endpoint ) = @_;
+    my ( $blog, $asset ) = context_objects( @_ ) or return;
+    if ( MT->config( 'DataAPIAssetsRequiresLogin' ) ) {
+        if (! $app->user || $app->user->is_anonymous ) {
+            return $app->print_error( 'Unauthorized', 401 );
+        } elsif (! $app->can_do( 'access_to_insert_asset_list' ) ) {
+            return $app->print_error( 'Permission denied.', 401 );
+        }
+    }
+    return $asset;
+}
+
 sub list_assets {
     my ( $app, $endpoint ) = @_;
     my ( $blog ) = context_objects( @_ ) or return;
     if ( MT->config( 'DataAPIAssetsRequiresLogin' ) ) {
-        if (! $app->user || $app->user->is_anonymous
-            || (! $app->can_do( 'access_to_insert_asset_list' ) ) ) {
+        if (! $app->user || $app->user->is_anonymous ) {
             return $app->print_error( 'Unauthorized', 401 );
+        } elsif (! $app->can_do( 'access_to_insert_asset_list' ) ) {
+            return $app->print_error( 'Permission denied.', 401 );
         }
     }
     my $route = $endpoint->{ route };

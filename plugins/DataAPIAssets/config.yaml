@@ -31,6 +31,12 @@ applications:
               version: 1
               handler: DataAPIAssets::EndPoint::Asset::list_assets
               requires_login: 0
+            - id: get_asset
+              route: /sites/:site_id/assets/:asset_id
+              verb: GET
+              version: 1
+              handler: DataAPIAssets::EndPoint::Asset::get_asset
+              requires_login: 0
         resources:
             asset:
                 fields:
@@ -38,3 +44,5 @@ applications:
                       from_object: DataAPIAssets::Resource::Asset::image_width
                     - name: image_height
                       from_object: DataAPIAssets::Resource::Asset::image_height
+                    - name: icon_url
+                      from_object: DataAPIAssets::Resource::Asset::icon_url
