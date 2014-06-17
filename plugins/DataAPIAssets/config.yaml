@@ -1,9 +1,9 @@
 name: DataAPIAssets
 id:   DataAPIAssets
-version: 0.3
+version: 0.4
 config_settings:
     DataAPIAssetsRequiresLogin:
-        default: 1
+        default: 0
         updatable: 1
     DataAPIAssetsIconSize:
         default: 45
@@ -44,9 +44,45 @@ applications:
         resources:
             asset:
                 fields:
+                    - name: icon_url
+                      from_object: DataAPIAssets::Resource::Asset::icon_url
+            image:
+                fields:
                     - name: image_width
                       from_object: DataAPIAssets::Resource::Asset::image_width
                     - name: image_height
                       from_object: DataAPIAssets::Resource::Asset::image_height
                     - name: icon_url
                       from_object: DataAPIAssets::Resource::Asset::icon_url
+                    - name: id
+                    - name: url
+                    - name: label
+                    - name: description
+                    - name: mimeType
+                      from_object: sub { my ($obj) = @_; $obj->mime_type;}
+                    - name: tags
+                      from_object: sub { my ($obj) = @_; [ $obj->tags ];}
+            video:
+                fields:
+                    - name: icon_url
+                      from_object: DataAPIAssets::Resource::Asset::icon_url
+                    - name: id
+                    - name: url
+                    - name: label
+                    - name: description
+                    - name: mimeType
+                      from_object: sub { my ($obj) = @_; $obj->mime_type;}
+                    - name: tags
+                      from_object: sub { my ($obj) = @_; [ $obj->tags ];}
+            audio:
+                fields:
+                    - name: icon_url
+                      from_object: DataAPIAssets::Resource::Asset::icon_url
+                    - name: id
+                    - name: url
+                    - name: label
+                    - name: description
+                    - name: mimeType
+                      from_object: sub { my ($obj) = @_; $obj->mime_type;}
+                    - name: tags
+                      from_object: sub { my ($obj) = @_; [ $obj->tags ];}
