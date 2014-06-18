@@ -1,6 +1,6 @@
 name: DataAPIAssets
 id:   DataAPIAssets
-version: 0.4
+version: 0.5
 config_settings:
     DataAPIAssetsRequiresLogin:
         default: 0
@@ -41,6 +41,18 @@ applications:
               version: 1
               handler: DataAPIAssets::EndPoint::Asset::get_asset
               requires_login: 0
+            - id: update_asset
+              route: /sites/:site_id/assets/:asset_id
+              verb: POST
+              version: 1
+              handler: DataAPIAssets::EndPoint::Asset::update_asset
+              requires_login: 1
+            - id: delete_asset
+              route: /sites/:site_id/assets/:asset_id
+              verb: DELETE
+              version: 1
+              handler: DataAPIAssets::EndPoint::Asset::delete_asset
+              requires_login: 1
         resources:
             asset:
                 fields:
