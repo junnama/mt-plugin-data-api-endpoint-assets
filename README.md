@@ -37,8 +37,8 @@ This method accepts POST only\.
 
 #### Request Body
 
-* asset : An Asset resource for update\(JSON\)\.
-* file: file data to overwrite\.
+* asset : An Asset resource for update\(JSON\)\(optional\)\.
+* file: file data to overwrite\(optional\)\.
 
 ### Assets: delete
 
