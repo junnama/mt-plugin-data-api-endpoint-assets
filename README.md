@@ -14,7 +14,7 @@ This method accepts GET only\.
     GET https://your-host/your-mt-api.cgi/v1/sites/{blog_id}/assets/video
     GET https://your-host/your-mt-api.cgi/v1/sites/{blog_id}/assets/audio
 
-### Response
+#### Response
 
 * totalResults : The total number of assets found that by the requesst\.
 * items : An array of assets resource\.
