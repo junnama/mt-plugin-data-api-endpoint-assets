@@ -48,7 +48,7 @@ This method accepts DELETE and POST with \_\_method=DELETE\.
 
     DELETE https://your-host/your-mt-api.cgi/v1/sites/{blog_id}/assets/{asset_id}
 
-## Additional Resources
+### Additional Resources
 
 See <a href="https://github.com/movabletype/Documentation/wiki/data-api-resource-assets" target="_blank">https://github.com/movabletype/Documentation/wiki/data-api-resource-assets</a>
 
