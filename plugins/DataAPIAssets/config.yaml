@@ -1,6 +1,6 @@
 name: DataAPIAssets
 id:   DataAPIAssets
-version: 0.5
+version: 0.6
 config_settings:
     DataAPIAssetsRequiresLogin:
         default: 0

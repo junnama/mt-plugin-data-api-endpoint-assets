@@ -36,12 +36,12 @@ sub update_asset {
     } else {
         $new_obj = $app->resource_object( 'asset', $asset ) or return;
     }
-    my $tmp_id;
+    my ( $tmp_id, $tmp_file );
+    require MT::FileMgr;
+    my $fmgr = MT::FileMgr->new( 'Local' ) or die MT::FileMgr->errstr;
     if ( $fh ) {
         return $app->error( 403 ) unless $app->can_do( 'upload' );
-        my $tmp_file = $asset->file_path;
-        require MT::FileMgr;
-        my $fmgr = MT::FileMgr->new( 'Local' ) or die MT::FileMgr->errstr;
+        $tmp_file = $asset->file_path;
         if ( $fmgr->exists( $tmp_file ) ) {
             $fmgr->rename( $tmp_file, "${tmp_file}.tmp" );
         }
@@ -58,46 +58,67 @@ sub update_asset {
                 $app->param( $keys{ $key }, $value );
             }
         }
+        require MT::CMS::Asset;
         my ( $upload_asset, $bytes ) = MT::CMS::Asset::_upload_file( $app, @_ );
         if (! $upload_asset ) {
             $fmgr->rename( "${tmp_file}.tmp", $tmp_file );
             return $app->error( 500 );
         } else {
-            $fmgr->delete( "${tmp_file}.tmp" );
             $tmp_id = $upload_asset->id;
-            $upload_asset->id( $asset->id );
             $upload_asset->clear_cache();
-            if ( $app->param( 'asset' ) ) {
-                $new_obj = $app->resource_object( 'asset', $upload_asset ) or return;
-            } else {
-                $new_obj = $upload_asset;
-                my $cols = $asset->column_names;
-                my @not_cp = qw( file_path mime_type url class );
-                for my $col ( @$cols ) {
+            $upload_asset->clear_cache();
+            $new_obj = MT->model( $upload_asset->class )->new;
+            my $cols = $asset->column_names;
+            my @not_cp = qw( file_path mime_type url class image_width image_height );
+            for my $col ( @$cols ) {
+                if ( $new_obj->has_column( $col ) ) {
                     if (! grep( /^$col$/, @not_cp ) ) {
-                        if ( $new_obj->has_column( $col ) ) {
-                            $new_obj->$col( $asset->$col );
-                        }
+                        $new_obj->$col( $asset->$col );
+                    } else {
+                        $new_obj->$col( $upload_asset->$col );
                     }
                 }
             }
+            if ( $upload_asset->class eq 'image' ) {
+                $new_obj->image_width( $upload_asset->image_width );
+                $new_obj->image_height( $upload_asset->image_height );
+            }
             $new_obj->clear_cache();
+            $new_obj->id( $asset->id );
+            $new_obj->save or return $app->error( 500 );
+            if ( $app->param( 'asset' ) ) {
+                $new_obj = $app->resource_object( 'asset', $new_obj ) or return;
+            }
         }
     }
+    $asset->clear_cache();
+    $new_obj->clear_cache();
     save_object(
         $app, 'asset',
         $new_obj,
         $asset,
         sub {
+            $new_obj->id( $asset->id );
             $new_obj->modified_by( $app->user->id );
             $_[ 0 ]->();
         }
     ) or return;
     if ( $tmp_id ) {
+        my $new_file = $new_obj->file_path;
+        if ( $fmgr->exists( $new_file ) ) {
+            $fmgr->rename( $new_file, "${new_file}.tmp" );
+        }
         if ( my $upload = MT->model( 'asset' )->load( $tmp_id ) ) {
             $upload->remove or return $app->error( 500 );
         }
+        if ( $fmgr->exists( "${new_file}.tmp" ) ) {
+            $fmgr->rename( "${new_file}.tmp", $new_file );
+        }
+        if ( $fmgr->exists( "${tmp_file}.tmp" ) ) {
+            $fmgr->delete( "${tmp_file}.tmp" );
+        }
     }
+    $new_obj->clear_cache();
     return $new_obj;
 }
 
