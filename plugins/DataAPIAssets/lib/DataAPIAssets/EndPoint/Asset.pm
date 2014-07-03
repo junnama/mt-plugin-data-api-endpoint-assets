@@ -3,6 +3,18 @@ use strict;
 
 use MT::DataAPI::Endpoint::Common;
 
+sub data_api_pre_save_asset {
+    my ( $cb, $app, $obj, $original ) = @_;
+    if ( my $asset = $app->param( 'asset' ) ) {
+        $asset = MT::DataAPI::Format::JSON::unserialize( $asset );
+        my $tags = $asset->{ tags };
+        if (ref $tags ne 'ARRAY' ) {
+            $obj->remove_tags;
+        }
+    }
+    return 1;
+}
+
 sub get_asset {
     my ( $app, $endpoint ) = @_;
     my ( $blog, $asset ) = context_objects( @_ ) or return;
@@ -93,12 +105,15 @@ sub update_asset {
     }
     $asset->clear_cache();
     $new_obj->clear_cache();
+    my @tl = MT::Util::offset_time_list( time, $blog );
+    my $ts = sprintf '%04d%02d%02d%02d%02d%02d', $tl[ 5 ] + 1900, $tl[ 4 ] + 1, @tl[ 3, 2, 1, 0 ];
     save_object(
         $app, 'asset',
         $new_obj,
         $asset,
         sub {
             $new_obj->id( $asset->id );
+            $new_obj->modified_on( $ts );
             $new_obj->modified_by( $app->user->id );
             $_[ 0 ]->();
         }
@@ -108,8 +123,10 @@ sub update_asset {
         if ( $fmgr->exists( $new_file ) ) {
             $fmgr->rename( $new_file, "${new_file}.tmp" );
         }
-        if ( my $upload = MT->model( 'asset' )->load( $tmp_id ) ) {
-            $upload->remove or return $app->error( 500 );
+        if ( $tmp_id != $new_obj->id ) {
+            if ( my $upload = MT->model( 'asset' )->load( $tmp_id ) ) {
+                $upload->remove or return $app->error( 500 );
+            }
         }
         if ( $fmgr->exists( "${new_file}.tmp" ) ) {
             $fmgr->rename( "${new_file}.tmp", $new_file );
@@ -154,7 +171,7 @@ sub list_assets {
     # limit offset
     my $args;
     my $sort_order = 'descend';
-    my $sort_by = 'id';
+    my $sort_by = 'modified_on';
     my @sort_col = qw( created_on modified_on id label );
     if ( my $sortBy = $app->param( 'sortBy' ) ) {
         if ( grep( /^$sortBy$/, @sort_col ) ) {
@@ -166,7 +183,7 @@ sub list_assets {
             $sort_order = $sortOrder;
         }
     }
-    $args->{ sort_by } = $sort_by;
+    $args->{ sort } = $sort_by;
     $args->{ direction } = $sort_order;
     my $limit = 10;
     if ( $app->param( 'limit' ) ) {

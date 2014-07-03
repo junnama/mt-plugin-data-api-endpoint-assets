@@ -1,6 +1,6 @@
 name: DataAPIAssets
 id:   DataAPIAssets
-version: 0.6
+version: 0.7
 config_settings:
     DataAPIAssetsRequiresLogin:
         default: 0
@@ -8,6 +8,8 @@ config_settings:
     DataAPIAssetsIconSize:
         default: 45
         updatable: 1
+callbacks:
+    data_api_pre_save.asset: DataAPIAssets::EndPoint::Asset::data_api_pre_save_asset
 applications:
     data_api:
         endpoints:
@@ -41,9 +43,15 @@ applications:
               version: 1
               handler: DataAPIAssets::EndPoint::Asset::get_asset
               requires_login: 0
-            - id: update_asset
+            - id: overwrite_asset
               route: /sites/:site_id/assets/:asset_id
               verb: POST
+              version: 1
+              handler: DataAPIAssets::EndPoint::Asset::update_asset
+              requires_login: 1
+            - id: update_asset
+              route: /sites/:site_id/assets/:asset_id
+              verb: PUT
               version: 1
               handler: DataAPIAssets::EndPoint::Asset::update_asset
               requires_login: 1
@@ -58,6 +66,7 @@ applications:
                 fields:
                     - name: icon_url
                       from_object: DataAPIAssets::Resource::Asset::icon_url
+                    - name: file_name
             image:
                 fields:
                     - name: image_width
@@ -67,6 +76,7 @@ applications:
                     - name: icon_url
                       from_object: DataAPIAssets::Resource::Asset::icon_url
                     - name: id
+                    - name: file_name
                     - name: url
                     - name: label
                     - name: description
@@ -79,6 +89,7 @@ applications:
                     - name: icon_url
                       from_object: DataAPIAssets::Resource::Asset::icon_url
                     - name: id
+                    - name: file_name
                     - name: url
                     - name: label
                     - name: description
@@ -91,6 +102,7 @@ applications:
                     - name: icon_url
                       from_object: DataAPIAssets::Resource::Asset::icon_url
                     - name: id
+                    - name: file_name
                     - name: url
                     - name: label
                     - name: description
