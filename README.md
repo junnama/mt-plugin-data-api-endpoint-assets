@@ -31,7 +31,7 @@ This method accepts GET only\.
 
 Authorization is required
 
-This method accepts POST only\.
+This method accepts PUT and POST with \_\_method=PUT\.
 
     POST https://your-host/your-mt-api.cgi/v1/sites/{blog_id}/assets/{asset_id}
 
