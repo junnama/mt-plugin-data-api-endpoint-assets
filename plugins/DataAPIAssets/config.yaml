@@ -1,6 +1,6 @@
 name: DataAPIAssets
 id:   DataAPIAssets
-version: 0.7
+version: 0.8
 config_settings:
     DataAPIAssetsRequiresLogin:
         default: 0
@@ -8,6 +8,13 @@ config_settings:
     DataAPIAssetsIconSize:
         default: 45
         updatable: 1
+list_properties:
+    asset:
+        modified_on:
+            base: __virtual.modified_on
+            label: Last Modified
+            display: optional
+            order: 501
 callbacks:
     data_api_pre_save.asset: DataAPIAssets::EndPoint::Asset::data_api_pre_save_asset
 applications:

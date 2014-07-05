@@ -151,7 +151,7 @@ sub delete_asset {
     return $asset;
 }
 
-sub list_assets {
+sub _list_assets {
     my ( $app, $endpoint ) = @_;
     my ( $blog ) = context_objects( @_ ) or return;
     if ( MT->config( 'DataAPIAssetsRequiresLogin' ) ) {
@@ -196,8 +196,30 @@ sub list_assets {
     $args->{ limit } = $limit;
     $args->{ offset } = $offset;
     my $terms = { blog_id => $blog->id };
-    my $count = MT->model( $class )->count( $terms );
-    my @assets = MT->model( $class )->load( $terms, $args );
+    my $count = 0;
+    my @assets = [];
+    if ( my $search = $app->param( 'search' ) ) {
+        $search = MT::Util::trim( $search );
+        # searchFields label,description,file_name
+        my $searchFields = $app->param( 'searchFields' ) || 'label,description,file_name';
+        my @fields = split( /,/, $searchFields );
+        my @queries = [ $terms, '-and' ];
+        my $i = 0;
+        for my $field( @fields ) {
+            $field = MT::Util::trim( $field );
+            push( @queries, { $field => { like => '%' . $search . '%' } } );
+            $i++;
+            if ( $i != scalar( @fields ) ) {
+                push( @queries, '-or' );
+            }
+            $terms->{ $field } = { like => '%' . $search . '%' };
+        }
+        $count = MT->model( $class )->count( \@queries );
+        @assets = MT->model( $class )->load( \@queries, $args );
+    } else {
+        $count = MT->model( $class )->count( $terms );
+        @assets = MT->model( $class )->load( $terms, $args );
+    }
     return {
         totalResults => $count + 0,
         items => \@assets,
