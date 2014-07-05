@@ -14,6 +14,15 @@ This method accepts GET only\.
     GET https://your-host/your-mt-api.cgi/v1/sites/{blog_id}/assets/video
     GET https://your-host/your-mt-api.cgi/v1/sites/{blog_id}/assets/audio
 
+#### Query Parameters
+
+* __search\(string\)__ : This is an optional parameter\. Search query\.
+* __searchFields\(string\)__ : This is an optional parameter\. The comma separated field name list to search\. Default is 'label,description,file\_name'
+* __limit\(unsigned integer\)__ : This is an optional parameter\. Maximum number of assets to retrieve. Default is 10\.
+* offset\(unsigned integer\) : This is an optional parameter\. 0\-indexed offset\. Default is 0\.
+* __sortBy\(string\)__ : This is an optional parameter\(Default: modified\_on\)\.
+* __sortOrder\(string\)__ : This is an optional parameter\(Default: descend\)\.
+
 #### Response
 
 * totalResults : The total number of assets found that by the requesst\.
