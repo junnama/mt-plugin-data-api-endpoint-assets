@@ -212,7 +212,6 @@ sub _list_assets {
             if ( $i != scalar( @fields ) ) {
                 push( @queries, '-or' );
             }
-            $terms->{ $field } = { like => '%' . $search . '%' };
         }
         $count = MT->model( $class )->count( \@queries );
         @assets = MT->model( $class )->load( \@queries, $args );
